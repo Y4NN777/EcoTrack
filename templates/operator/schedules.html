@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center mb-4">Collection Schedules</h1>
+            {% if current_user.is_operator() %}
+            <div class="text-end">
+                <a href="{{ url_for('operator.new_schedule') }}" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus me-2"></i>Add New Schedule
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Waste Type</th>
+                                    <th>Route</th>
+                                    <th>Team</th>
+                                    <th>Status</th>
+                                    {% if current_user.is_operator() %}
+                                    <th>Actions</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td>{{ schedule.pickup_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ schedule.waste_type.name }}</td>
+                                    <td>{{ schedule.route }}</td>
+                                    <td>{{ schedule.team }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ schedule.status|lower|replace(' ', '-') }}">
+                                            {{ schedule.status }}
+                                        </span>
+                                    </td>
+                                    {% if current_user.is_operator() %}
+                                    <td>
+                                        <a href="{{ url_for('operator.edit_schedule', id=schedule.id) }}" 
+                                           class="btn btn-sm btn-info">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-danger delete-schedule" 
+                                                data-schedule-id="{{ schedule.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete schedule with SweetAlert
+    const deleteButtons = document.querySelectorAll('.delete-schedule');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.dataset.scheduleId;
+            
+            Swal.fire({
+                title: 'Delete Schedule?',
+                text: 'This action cannot be undone',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/operator/schedule/${scheduleId}/delete`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok && data.status === 'success') {
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: data.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            
+                            window.location.href = data.redirect;
+                        } else {
+                            throw new Error(data.message || 'Failed to delete schedule');
+                        }
+                    } catch (error) {
+                        console.error('Delete error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: error.message || 'Failed to delete schedule',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

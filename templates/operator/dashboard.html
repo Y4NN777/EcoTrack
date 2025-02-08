@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Operator Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Operator Dashboard</h2>
+    
+    <div class="card-grid">
+        <!-- Collections Card -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Today's Collections</h5>
+                        <h2 class="mb-0">{{ collections_today }}</h2>
+                    </div>
+                    <div class="dashboard-icon">
+                        <i class="fas fa-truck text-primary"></i>
+                    </div>
+                </div>
+                <p class="card-text mt-3">Collections scheduled for today</p>
+                <a href="{{ url_for('operator.collections') }}" class="btn btn-primary btn-sm mt-2">View Collections</a>
+            </div>
+        </div>
+
+        <!-- Schedules Card -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Scheduled Pickups</h5>
+                        <h2 class="mb-0">{{ scheduled_pickups }}</h2>
+                    </div>
+                    <div class="dashboard-icon">
+                        <i class="fas fa-calendar text-success"></i>
+                    </div>
+                </div>
+                <p class="card-text mt-3">Upcoming scheduled pickups</p>
+                <a href="{{ url_for('operator.schedules') }}" class="btn btn-success btn-sm mt-2">View Schedule</a>
+            </div>
+        </div>
+
+        <!-- Waste Types Card -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Waste Types</h5>
+                        <h2 class="mb-0">{{ waste_type_count }}</h2>
+                    </div>
+                    <div class="dashboard-icon">
+                        <i class="fas fa-recycle text-info"></i>
+                    </div>
+                </div>
+                <p class="card-text mt-3">Available waste categories</p>
+                <button class="btn btn-info btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#wasteTypesModal">View Types</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Waste Types Modal -->
+<div class="modal fade" id="wasteTypesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Waste Types</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    {% for type in waste_types %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ type.name }}</h6>
+                        <p class="mb-1">{{ type.description }}</p>
+                        <small class="text-muted">Disposal: {{ type.disposal_method }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

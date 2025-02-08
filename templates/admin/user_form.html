@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block content %}
+{{ super() }}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ 'Edit User' if user else 'Add New User' }}</h5>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="userForm" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       value="{{ user.username if user else '' }}" required
+                                       pattern="[a-zA-Z0-9_]+" minlength="3">
+                                <div class="invalid-feedback">
+                                    Username must be at least 3 characters and can only contain letters, numbers, and underscores.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                       value="{{ user.email if user else '' }}" required
+                                       pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name"
+                                       value="{{ user.first_name if user else '' }}" required
+                                       pattern="[a-zA-Z\s-]+" minlength="2">
+                                <div class="invalid-feedback">
+                                    First name must be at least 2 characters and can only contain letters, spaces, and hyphens.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name"
+                                       value="{{ user.last_name if user else '' }}" required
+                                       pattern="[a-zA-Z\s-]+" minlength="2">
+                                <div class="invalid-feedback">
+                                    Last name must be at least 2 characters and can only contain letters, spaces, and hyphens.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                {{ 'New Password (leave blank to keep current)' if user else 'Password' }}
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       {{ 'required' if not user else '' }}>
+                                <button class="btn btn-outline-secondary toggle-password" type="button">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-requirements small text-muted mt-1">
+                                <small class="d-inline-block me-3"><i class="fas fa-circle"></i> Min 6 chars</small>
+                                <small class="d-inline-block me-3"><i class="fas fa-circle"></i> Uppercase</small>
+                                <small class="d-inline-block me-3"><i class="fas fa-circle"></i> Lowercase</small>
+                                <small class="d-inline-block me-3"><i class="fas fa-circle"></i> Number</small>
+                                <small class="d-inline-block"><i class="fas fa-circle"></i> Special char</small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">Select a role</option>
+                                <option value="Administrator" 
+                                        {{ 'selected' if user and user.role == 'Administrator' else '' }}>
+                                    Administrator
+                                </option>
+                                <option value="Waste Management Operator"
+                                        {{ 'selected' if user and user.role == 'Waste Management Operator' else '' }}>
+                                    Waste Management Operator
+                                </option>
+                                <option value="Reporting User"
+                                        {{ 'selected' if user and user.role == 'Reporting User' else '' }}>
+                                    Reporting User
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Please select a role.</div>
+                        </div>
+                        {% if user %}
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                                       {{ 'checked' if user.is_active else '' }}>
+                                <label class="form-check-label" for="is_active">Active</label>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {{ 'Update User' if user else 'Create User' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('userForm');
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.querySelector('.toggle-password');
+    
+    // Password toggle functionality
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    }
+
+    // Form submission
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        // Show loading state
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                // Show success message
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                // Redirect to users list
+                window.location.href = "{{ url_for('admin.users') }}";
+            } else {
+                throw new Error(data.message || 'An error occurred');
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: error.message || 'Failed to process request',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+
+    // Password validation
+    function validatePassword(password) {
+        if (!password) return false;
+        
+        const requirements = {
+            length: {
+                test: password.length >= 6,
+                message: 'Min 6 chars'
+            },
+            uppercase: {
+                test: /[A-Z]/.test(password),
+                message: 'Uppercase'
+            },
+            lowercase: {
+                test: /[a-z]/.test(password),
+                message: 'Lowercase'
+            },
+            number: {
+                test: /[0-9]/.test(password),
+                message: 'Number'
+            },
+            special: {
+                test: /[!@#$%^&*()_+\-=\[\]{};:'",.<>/?\\|]/.test(password),
+                message: 'Special char'
+            }
+        };
+
+        const requirementElements = document.querySelectorAll('.password-requirements small');
+        let failedRequirements = [];
+
+        Object.entries(requirements).forEach(([key, value], index) => {
+            const icon = requirementElements[index].querySelector('i');
+            icon.classList.remove('fa-circle', 'fa-check-circle', 'text-success');
+            icon.classList.add(value.test ? 'fa-check-circle' : 'fa-circle');
+            if (value.test) {
+                icon.classList.add('text-success');
+            } else {
+                failedRequirements.push(value.message);
+            }
+        });
+
+        return {
+            isValid: failedRequirements.length === 0,
+            failedRequirements
+        };
+    }
+
+    // Real-time validation
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            validatePassword(this.value);
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% if collection %}Edit{% else %}New{% endif %} Collection</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="collectionForm">
+                        <div class="mb-3">
+                            <label for="user_id" class="form-label">User</label>
+                            <select class="form-select" id="user_id" name="user_id" required>
+                                <option value="">Select a user...</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" 
+                                    {% if collection and collection.user_id == user.id %}
+                                        selected
+                                    {% elif form_data and form_data.user_id|string == user.id|string %}
+                                        selected
+                                    {% endif %}>
+                                    {{ user.username }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="waste_type_id" class="form-label">Waste Type</label>
+                            <select class="form-select" id="waste_type_id" name="waste_type_id" required>
+                                <option value="">Select a waste type...</option>
+                                {% for waste_type in waste_types %}
+                                <option value="{{ waste_type.id }}"
+                                    {% if collection and collection.waste_type_id == waste_type.id %}
+                                        selected
+                                    {% elif form_data and form_data.waste_type_id|string == waste_type.id|string %}
+                                        selected
+                                    {% endif %}>
+                                    {{ waste_type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity (kg)</label>
+                            <input type="number" step="0.01" class="form-control" id="quantity" name="quantity" 
+                                   value="{{ collection.quantity if collection else form_data.quantity if form_data else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="collection_date" class="form-label">Collection Date and Time</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" class="form-control" id="collection_date" name="collection_date" 
+                                           value="{{ collection.collection_date.strftime('%Y-%m-%d') if collection else form_data.collection_date if form_data else '' }}"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="time" class="form-control" id="collection_time" name="collection_time"
+                                           value="{{ collection.collection_date.strftime('%H:%M') if collection else form_data.collection_time if form_data else '' }}"
+                                           required>
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                You can log collections from the past or up to 1 hour in the future. For collections further in the future, please use the Schedules feature.
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   value="{{ collection.location if collection else form_data.location if form_data else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                {% set status_value = collection.status if collection else form_data.status if form_data else 'Pending' %}
+                                <option value="Pending" {% if status_value == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="In Progress" {% if status_value == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if status_value == 'Completed' %}selected{% endif %}>Completed</option>
+                                <option value="Cancelled" {% if status_value == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ url_for('admin.collections') }}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('collectionForm');
+    const dateInput = document.getElementById('collection_date');
+    const timeInput = document.getElementById('collection_time');
+
+    // Set min and max dates
+    const today = new Date();
+    const maxDate = new Date(today);
+    maxDate.setHours(today.getHours() + 1); // 1 hour in the future
+
+    // Format for date input
+    const formatDate = (date) => {
+        return date.toISOString().split('T')[0];
+    };
+
+    // Format for time input
+    const formatTime = (date) => {
+        return date.toTimeString().slice(0, 5);
+    };
+
+    // Set initial max date and time
+    dateInput.max = formatDate(maxDate);
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const selectedDate = new Date(dateInput.value + 'T' + timeInput.value);
+        const now = new Date();
+        const maxAllowed = new Date(now.getTime() + 60 * 60 * 1000); // now + 1 hour
+
+        if (selectedDate > maxAllowed) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Collection Time',
+                text: 'Collections can only be logged up to 1 hour in the future. For later collections, please use the Schedules feature.',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
+
+        // If validation passes, submit the form
+        form.submit();
+    });
+
+    // Update time input max when date changes
+    dateInput.addEventListener('change', function() {
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        
+        if (selectedDate.toDateString() === today.toDateString()) {
+            // If today is selected, limit time to 1 hour in the future
+            const maxTime = new Date(today.getTime() + 60 * 60 * 1000);
+            timeInput.max = formatTime(maxTime);
+        } else if (selectedDate > today) {
+            // If future date is selected, only allow first hour of the day
+            timeInput.max = "01:00";
+        } else {
+            // If past date is selected, allow any time
+            timeInput.removeAttribute('max');
+        }
+    });
+});
+</script>
+{% endblock %}

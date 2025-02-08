@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% if collection %}Edit{% else %}Log New{% endif %} Collection</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Use this form to log waste collections that have already occurred. For future collections, please use the Schedule feature.
+                    </div>
+                    <form method="POST" id="collectionForm" action="{{ url_for('operator.edit_collection', id=collection.id) if collection else url_for('operator.new_collection') }}">
+                        <div class="mb-3">
+                            <label for="waste_type_id" class="form-label">Waste Type</label>
+                            <select class="form-select" id="waste_type_id" name="waste_type_id" required>
+                                <option value="">Select a waste type...</option>
+                                {% for waste_type in waste_types %}
+                                <option value="{{ waste_type.id }}" {% if collection and collection.waste_type_id == waste_type.id %}selected{% endif %}>
+                                    {{ waste_type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity (kg)</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="quantity" name="quantity" 
+                                   value="{{ collection.quantity if collection else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="collection_date" class="form-label">Collection Date and Time</label>
+                            <input type="datetime-local" class="form-control" id="collection_date" name="collection_date" 
+                                   value="{{ collection.collection_date.strftime('%Y-%m-%dT%H:%M') if collection else '' }}" required>
+                            <small class="text-muted">
+                                Enter when the collection occurred. Cannot be in the future.
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   value="{{ collection.location if collection else '' }}" required>
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ url_for('operator.collections') }}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form submission with SweetAlert
+    const form = document.getElementById('collectionForm');
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const collectionDate = new Date(document.getElementById('collection_date').value);
+        const now = new Date();
+        
+        // Check if date is in the future (with 1 hour buffer)
+        if (collectionDate > new Date(now.getTime() + 60 * 60 * 1000)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date',
+                text: 'Collection date cannot be in the future. Use the Schedule feature for future collections.'
+            });
+            return;
+        }
+
+        // Show loading state
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.status === 'success') {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                // Redirect after success
+                window.location.href = data.redirect;
+            } else {
+                throw new Error(data.message || 'An error occurred');
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: error.message || 'Failed to process request',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

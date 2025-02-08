@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h4>Create an Account</h4>
+            <p>Join EcoTrack Waste Management System</p>
+        </div>
+        <div class="auth-body">
+            <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
+                <!-- Personal Information -->
+                <div class="section-title">Personal Information</div>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" class="form-control form-control-icon" id="first_name" name="first_name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" class="form-control form-control-icon" id="last_name" name="last_name" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Information -->
+                <div class="section-title">Account Information</div>
+                <div class="mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-at input-icon"></i>
+                        <input type="text" class="form-control form-control-icon" id="username" name="username" required>
+                    </div>
+                    <div class="form-text">Username must be at least 4 characters long</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" class="form-control form-control-icon" id="email" name="email" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" class="form-control form-control-icon" id="password" name="password" required>
+                        <button class="btn btn-password-toggle" type="button">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength-container">
+                        <div class="password-strength-wrapper">
+                            <div id="password-strength" class="password-strength-bar"></div>
+                        </div>
+                        <span id="strength-text" class="password-strength-text"></span>
+                    </div>
+                    <ul class="password-requirements">
+                        <li><i class="fas fa-circle"></i>6+ chars</li>
+                        <li><i class="fas fa-circle"></i>Uppercase</li>
+                        <li><i class="fas fa-circle"></i>Lowercase</li>
+                        <li><i class="fas fa-circle"></i>Number</li>
+                        <li><i class="fas fa-circle"></i>Special</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4">
+                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" class="form-control form-control-icon" id="confirm_password" name="confirm_password" required>
+                        <button class="btn btn-password-toggle" type="button">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-match-feedback" id="password-match-feedback"></div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="role" class="form-label">Role</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-user-tag input-icon"></i>
+                        <select class="form-select form-control-icon" value="Select a role..." id="role" name="role" required>
+                            <option value="Waste Management Operator">Waste Management Operator</option>
+                            <option value="Reporting User">Reporting User</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="terms_accept" name="terms_accept" required>
+                    <label class="form-check-label" for="terms_accept">
+                        I agree to the <a href="{{ url_for('terms') }}" class="text-primary" target="_blank">Terms of Service</a> 
+                        and <a href="{{ url_for('privacy') }}" class="text-primary" target="_blank">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div class="auth-buttons">
+                    <button type="submit" class="btn btn-auth btn-auth-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </button>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-auth btn-auth-secondary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Already have an account? Login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script>
+function updatePasswordRequirements(password) {
+    const requirements = document.querySelectorAll('.password-requirements li');
+    
+    // Check each requirement
+    requirements[0].classList.toggle('valid', password.length >= 6);
+    requirements[1].classList.toggle('valid', /[A-Z]/.test(password));
+    requirements[2].classList.toggle('valid', /[a-z]/.test(password));
+    requirements[3].classList.toggle('valid', /\d/.test(password));
+    requirements[4].classList.toggle('valid', /[!@#$%^&*(),.?":{}|<>]/.test(password));
+
+    // Update icons
+    requirements.forEach(req => {
+        const icon = req.querySelector('i');
+        if (req.classList.contains('valid')) {
+            icon.classList.remove('fa-circle');
+            icon.classList.add('fa-check-circle');
+        } else {
+            icon.classList.remove('fa-check-circle');
+            icon.classList.add('fa-circle');
+        }
+    });
+}
+
+// Password validation
+const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('confirm_password');
+const passwordMatchFeedback = document.getElementById('password-match-feedback');
+
+['input', 'keyup'].forEach(event => {
+    passwordInput.addEventListener(event, function() {
+        updatePasswordRequirements(this.value);
+        checkPasswordMatch();
+    });
+});
+
+['input', 'keyup'].forEach(event => {
+    confirmPasswordInput.addEventListener(event, checkPasswordMatch);
+});
+
+function checkPasswordMatch() {
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    
+    if (confirmPassword) {
+        if (password === confirmPassword) {
+            passwordMatchFeedback.textContent = 'Passwords match';
+            passwordMatchFeedback.classList.remove('text-danger');
+            passwordMatchFeedback.classList.add('text-success');
+        } else {
+            passwordMatchFeedback.textContent = 'Passwords do not match';
+            passwordMatchFeedback.classList.remove('text-success');
+            passwordMatchFeedback.classList.add('text-danger');
+        }
+    } else {
+        passwordMatchFeedback.textContent = '';
+    }
+}
+
+// Password toggle functionality
+document.querySelectorAll('.btn-password-toggle').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent form submission
+        const input = this.closest('.input-icon-wrapper').querySelector('input');
+        const icon = this.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+});
+</script>
+{% endblock %}
