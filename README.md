@@ -148,4 +148,7 @@ This project is released under the **MIT License**, with the following permissio
 - **Commercial use or sublicensing of the software is not permitted without explicit permission** from the author.
 - The software is provided "as is", without warranty of any kind, either express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, or noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the Software.
 
+See the [LICENSE](https://github.com/your-username/your-repo/blob/main/LICENSE) file for details.
+
+
 By using this software, you agree to the terms outlined above.
