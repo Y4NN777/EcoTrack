@@ -131,13 +131,11 @@ wms/
 ## Important notes and Support
 
 This software is being in progress of deployment and will be available soon on the internet for beta testing,
-and then open sourced 
-For more information, contact:
+and then open sourced,For more information, contact:
 
 - **DABO R Yanis Axel**
 - Email: `axel.studiesmail@gmail.com`
 - WhatsApp: `+226 67 26 08 83`
-
 
 ## License
 
