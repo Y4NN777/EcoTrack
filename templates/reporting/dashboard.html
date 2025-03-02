@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Reporting Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Reporting Dashboard</h2>
+    
+    <div class="card-grid">
+        <!-- Collections Card -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Total Collections</h5>
+                        <h2 class="mb-0">{{ total_collections }}</h2>
+                    </div>
+                    <div class="dashboard-icon">
+                        <i class="fas fa-truck text-primary"></i>
+                    </div>
+                </div>
+                <p class="card-text mt-3">Total waste collections recorded</p>
+            </div>
+        </div>
+
+        <!-- Waste Types Card -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Waste Categories</h5>
+                        <h2 class="mb-0">{{ total_waste_types }}</h2>
+                    </div>
+                    <div class="dashboard-icon">
+                        <i class="fas fa-recycle text-success"></i>
+                    </div>
+                </div>
+                <p class="card-text mt-3">Different types of waste managed</p>
+            </div>
+        </div>
+
+        <!-- Schedules Card -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Total Schedules</h5>
+                        <h2 class="mb-0">{{ total_schedules }}</h2>
+                    </div>
+                    <div class="dashboard-icon">
+                        <i class="fas fa-calendar text-info"></i>
+                    </div>
+                </div>
+                <p class="card-text mt-3">Scheduled pickups in the system</p>
+            </div>
+        </div>
+
+        <!-- Reports Card -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Generate Report</h5>
+                    </div>
+                    <div class="dashboard-icon">
+                        <i class="fas fa-file-alt text-warning"></i>
+                    </div>
+                </div>
+                <p class="card-text mt-3">Create new waste management reports</p>
+                <a href="{{ url_for('reporting.reports') }}" class="btn btn-warning btn-sm mt-2">Generate Reports</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Waste by Type Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Waste Collection by Type</h5>
+                    <canvas id="wasteByTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Reports -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Reports</h5>
+                    <div class="list-group">
+                        {% for report in recent_reports %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ report.type.title() }} Report</h6>
+                                <small class="text-muted">{{ report.generated_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <p class="mb-1">Period: {{ report.period }}</p>
+                            <small class="text-{{ 'success' if report.status == 'Completed' else 'warning' }}">
+                                {{ report.status }}
+                            </small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Prepare data for the chart
+    const wasteData = `{{ waste_by_type|tojson }}`;
+    const labels = wasteData.map(item => item[0]);
+    const quantities = wasteData.map(item => item[1]);
+
+    // Create the chart
+    const ctx = document.getElementById('wasteByTypeChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Quantity (kg)',
+                data: quantities,
+                backgroundColor: 'rgba(44, 122, 123, 0.7)',
+                borderColor: 'rgba(44, 122, 123, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Quantity (kg)'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

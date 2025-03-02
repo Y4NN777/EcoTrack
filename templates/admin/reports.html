@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Reports Management</h2>
+        <div>
+            <button onclick="exportData()" class="btn btn-primary">
+                <i class="fas fa-download me-2"></i>Download Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Collections</h5>
+                    <h2 class="card-text">{{ total_collections }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Waste (kg)</h5>
+                    <h2 class="card-text">{{ total_waste_kg }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Active Users</h5>
+                    <h2 class="card-text">{{ active_users }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Completion Rate</h5>
+                    <h2 class="card-text">{{ completion_rate }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Waste by Type Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Waste Distribution by Type</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="wasteByTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collection Trends Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Collection Trends (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="collectionTrendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Prepare data for charts
+    const wasteByTypeData = {
+        labels: {{ waste_by_type | map(attribute=0) | list | tojson }},
+        datasets: [{
+            data: {{ waste_by_type | map(attribute=1) | list | tojson }},
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40'
+            ]
+        }]
+    };
+
+    const collectionTrendsData = {
+        labels: {{ collection_trends | map(attribute=0) | list | tojson }},
+        datasets: [{
+            label: 'Daily Collections (kg)',
+            data: {{ collection_trends | map(attribute=1) | list | tojson }},
+            fill: false,
+            borderColor: '#36A2EB',
+            tension: 0.1
+        }]
+    };
+
+    // Create charts
+    new Chart(document.getElementById('wasteByTypeChart'), {
+        type: 'pie',
+        data: wasteByTypeData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('collectionTrendsChart'), {
+        type: 'line',
+        data: collectionTrendsData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+});
+
+function exportData() {
+    // Show loading state
+    Swal.fire({
+        title: 'Exporting Data...',
+        text: 'Please wait while we prepare your export',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    // Send export request
+    fetch('{{ url_for("reporting.export_data") }}', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (response.headers.get('content-type').includes('application/json')) {
+            // If response is JSON, it's an error message
+            return response.json().then(data => {
+                throw new Error(data.message || 'Export failed');
+            });
+        }
+        // If response is not JSON, it's the file download
+        return response.blob();
+    })
+    .then(blob => {
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `waste_management_report_${new Date().toISOString().split('T')[0]}.csv`;
+        
+        // Trigger download
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        // Show success message
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Data exported successfully',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    })
+    .catch(error => {
+        console.error('Export error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: error.message || 'Failed to export data. Please try again.',
+            showConfirmButton: true
+        });
+    });
+}
+</script>
+{% endblock %}

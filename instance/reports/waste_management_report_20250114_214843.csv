@@ -1,0 +1,19 @@
+Summary Statistics (Last 30 Days)
+Total Collections,5
+Total Quantity (kg),2364.99
+
+Waste Distribution by Type
+Waste Type,Total Quantity (kg),Percentage of Total
+Medical waste,805.00,34.0%
+Metal,700.00,29.6%
+Organic Waste,599.99,25.4%
+Paper,200.00,8.5%
+E-waste,60.00,2.5%
+
+Daily Collection Trends
+Date,Total Collections,Total Quantity (kg),Average Quantity per Collection (kg)
+2025-01-08,1,599.99,599.99
+2025-01-10,1,60.00,60.00
+2025-01-13,1,700.00,700.00
+2025-01-14,1,805.00,805.00
+2025-01-14,1,200.00,200.00

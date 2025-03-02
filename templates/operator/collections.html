@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center mb-4">Waste Collections</h1>
+            {% if current_user.is_operator() %}
+            <div class="quick-actions-grid">
+                <a href="{{ url_for('operator.new_collection') }}" class="quick-action-btn">
+                    <i class="fas fa-truck-loading"></i>
+                    <span>Log New Collection</span>
+                </a>
+                <a href="{{ url_for('operator.schedules') }}" class="quick-action-btn">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span>Schedule Collection</span>
+                </a>
+                {% if current_user.is_reporting_user() %}
+                <a href="{{ url_for('operator.reports') }}" class="quick-action-btn">
+                    <i class="fas fa-chart-line"></i>
+                    <span>View Reports</span>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Waste Type</th>
+                                    <th>Quantity (kg)</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    {% if current_user.is_operator() %}
+                                    <th>Actions</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for collection in collections %}
+                                <tr>
+                                    <td>{{ collection.collection_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ collection.waste_type.name }}</td>
+                                    <td>{{ collection.quantity }}</td>
+                                    <td>{{ collection.location }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ collection.status|lower|replace(' ', '-') }}">
+                                            {{ collection.status }}
+                                        </span>
+                                    </td>
+                                    {% if current_user.is_operator() and collection.user_id == current_user.id %}
+                                    <td>
+                                        <a href="{{ url_for('operator.edit_collection', id=collection.id) }}" 
+                                           class="btn btn-sm btn-info">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-danger delete-collection" 
+                                                data-collection-id="{{ collection.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete collection with SweetAlert
+    const deleteButtons = document.querySelectorAll('.delete-collection');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const collectionId = this.dataset.collectionId;
+            
+            Swal.fire({
+                title: 'Delete Collection?',
+                text: 'This action cannot be undone',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/operator/collection/${collectionId}/delete`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok && data.status === 'success') {
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: data.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            
+                            window.location.href = data.redirect;
+                        } else {
+                            throw new Error(data.message || 'Failed to delete collection');
+                        }
+                    } catch (error) {
+                        console.error('Delete error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: error.message || 'Failed to delete collection',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

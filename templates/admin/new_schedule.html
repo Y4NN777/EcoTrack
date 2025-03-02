@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% if schedule %}Edit{% else %}Create New{% endif %} Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="scheduleForm">
+                        <div class="mb-3">
+                            <label for="waste_type_id" class="form-label">Waste Type</label>
+                            <select class="form-select" id="waste_type_id" name="waste_type_id" required>
+                                <option value="">Select a waste type...</option>
+                                {% for waste_type in waste_types %}
+                                <option value="{{ waste_type.id }}"
+                                    {% if schedule and schedule.waste_type_id == waste_type.id %}
+                                        selected
+                                    {% elif form_data and form_data.waste_type_id|string == waste_type.id|string %}
+                                        selected
+                                    {% endif %}>
+                                    {{ waste_type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pickup_date" class="form-label">Pickup Date and Time</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" class="form-control" id="pickup_date" name="pickup_date" 
+                                           value="{{ schedule.pickup_date.strftime('%Y-%m-%d') if schedule else form_data.pickup_date if form_data else '' }}" 
+                                           min="{{ today.strftime('%Y-%m-%d') }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="time" class="form-control" id="pickup_time" name="pickup_time"
+                                           value="{{ schedule.pickup_date.strftime('%H:%M') if schedule else form_data.pickup_time if form_data else '09:00' }}"
+                                           required>
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                Schedule collections for future dates. The scheduled time helps track upcoming collections on the dashboard.
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="route" class="form-label">Route</label>
+                            <input type="text" class="form-control" id="route" name="route" 
+                                   value="{{ schedule.route if schedule else form_data.route if form_data else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Team</label>
+                            <input type="text" class="form-control" id="team" name="team" 
+                                   value="{{ schedule.team if schedule else form_data.team if form_data else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                {% set status_value = schedule.status if schedule else form_data.status if form_data else 'Scheduled' %}
+                                <option value="Scheduled" {% if status_value == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                                <option value="In Progress" {% if status_value == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if status_value == 'Completed' %}selected{% endif %}>Completed</option>
+                                <option value="Cancelled" {% if status_value == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ url_for('admin.schedules') }}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('scheduleForm');
+    const dateInput = document.getElementById('pickup_date');
+    const timeInput = document.getElementById('pickup_time');
+
+    // Set min date to today
+    const today = new Date();
+    dateInput.min = today.toISOString().split('T')[0];
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const selectedDate = new Date(dateInput.value + 'T' + timeInput.value);
+        const now = new Date();
+
+        if (selectedDate <= now) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Schedule Time',
+                text: 'Schedule date and time must be in the future. For immediate or past collections, please use the Collections feature.',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
+
+        // If validation passes, submit the form
+        form.submit();
+    });
+});
+</script>
+{% endblock %}

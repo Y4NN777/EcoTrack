@@ -1,0 +1,1247 @@
+/*
+* EcoTrack - Waste Management System Styles
+* --------------------------------------
+* This stylesheet defines the visual appearance of the EcoTrack - Waste Management System.
+* It uses a combination of custom styles and Bootstrap overrides to create
+* a professional and user-friendly interface.
+*/
+
+/* ========== Global Styles ========== */
+:root {
+    /* Color Palette */
+    --primary-color: #2C7A7B;      /* Main brand color */
+    --primary-dark: #285E61;       /* Darker shade for hover states */
+    --primary-light: #4FD1C5;      /* Lighter shade for hover states */
+    --secondary-color: #718096;    /* Secondary color for contrast */
+    --background-light: #EDF2F7;   /* Light background for contrast */
+    --background-card: #FFFFFF;    /* Card and component backgrounds */
+    --text-dark: #2D3748;          /* Dark text color */
+    --text-light: #718096;         /* Light text color */
+    --danger: #E53E3E;             /* Danger color for alerts */
+    --warning: #D69E2E;            /* Warning color for alerts */
+    --success: #38A169;            /* Success color for alerts */
+    --info: #3182CE;               /* Info color for alerts */
+    --border-color: #E2E8F0;       /* Border color for components */
+    --hover-bg: #E2E8F0;           /* Background color for hover states */
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+}
+
+/* Base Styles
+   ========================================================================== */
+body {
+    background-color: var(--background-light);
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+}
+
+/* Layout Components
+   ========================================================================== */
+/* Main content wrapper */
+.content-wrapper {
+    flex: 1;
+    padding: var(--spacing-xl);
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    position: relative;
+    z-index: 1;
+}
+
+/* Container and row base styles */
+.container {
+    position: relative;
+    z-index: 2;
+}
+
+.row {
+    position: relative;
+    z-index: 2;
+}
+
+/* Navigation
+   ========================================================================== */
+.navbar {
+    background: var(--background-card);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    padding: 1rem 2rem;
+}
+
+.navbar-brand {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.02);
+    color: var(--primary-dark) !important;
+}
+
+.navbar-brand i {
+    font-size: 1.75rem;
+    margin-right: 0.75rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-brand:hover i {
+    transform: rotate(180deg);
+}
+
+.nav-link {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+    position: relative;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.nav-link:hover {
+    color: var(--primary-dark) !important;
+    transform: translateY(-1px);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Quick Action Components
+   ========================================================================== */
+/* Grid layout for quick action buttons */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    position: relative;
+    z-index: 100;
+}
+
+/* Quick action button base styles */
+.quick-action-btn {
+    position: relative;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 6px rgba(44, 122, 123, 0.1);
+    z-index: 101;
+}
+
+/* Ensure button content stays above hover effects */
+.quick-action-btn * {
+    position: relative;
+    z-index: 102;
+}
+
+/* Button icon styles */
+.quick-action-btn i {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+/* Button hover effects */
+.quick-action-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(44, 122, 123, 0.2);
+    color: white;
+    text-decoration: none;
+}
+
+/* Icon animation on hover */
+.quick-action-btn:hover i {
+    transform: translateX(4px);
+}
+
+/* Active state for buttons */
+.quick-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(44, 122, 123, 0.15);
+}
+
+/* Card Components
+   ========================================================================== */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-lg);
+}
+
+.card-body {
+    padding: var(--spacing-lg);
+    position: relative;
+    z-index: 1;
+}
+
+.card-title {
+    color: var(--text-dark);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Enhanced Stat Cards
+   ========================================================================== */
+.stat-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    padding: 2rem;
+    border-radius: 16px;
+    color: var(--background-card);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: -1;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+    top: -50%;
+    left: -50%;
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    transform: scale(0.5);
+    z-index: -1;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(44, 122, 123, 0.25);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-card:hover::after {
+    opacity: 1;
+    transform: scale(1) rotate(-10deg);
+}
+
+.stat-card i {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
+
+.stat-card:hover i {
+    transform: scale(1.2) rotate(15deg);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover h3 {
+    transform: scale(1.1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.stat-card p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+    transition: all 0.5s ease;
+}
+
+.stat-card:hover p {
+    opacity: 1;
+    transform: translateY(2px);
+}
+
+/* Activity Feed Enhanced Animations
+   ========================================================================== */
+.activity-item {
+    padding: 1rem;
+    border-radius: 10px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 0.5rem;
+    border: 1px solid transparent;
+}
+
+.activity-item:hover {
+    background: rgba(44, 122, 123, 0.08);
+    border-color: rgba(44, 122, 123, 0.2);
+    transform: translateX(5px) scale(1.01);
+}
+
+.activity-item i {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--primary-dark);
+}
+
+.activity-item:hover i {
+    transform: scale(1.2) rotate(10deg);
+    color: var(--primary-dark);
+}
+
+/* Form Components
+   ========================================================================== */
+.form-label {
+    color: var(--text-dark);
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+}
+
+.form-control,
+.form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: var(--background-card);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(44, 122, 123, 0.1);
+    outline: none;
+}
+
+/* Remove any pseudo-elements from form controls */
+.form-control::after,
+.form-control::before,
+.form-select::after,
+.form-select::before {
+    display: none !important;
+}
+
+/* Form Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--text-dark);
+    transform: translateY(-1px);
+}
+
+/* Form Layout */
+.mb-3 {
+    margin-bottom: var(--spacing-lg) !important;
+}
+
+.text-end {
+    text-align: right;
+}
+
+/* Remove card hover effects for forms */
+.card:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive Design
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Stack quick action buttons on mobile */
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Full-width buttons on mobile */
+    .quick-action-btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    /* Adjust spacing for mobile */
+    .content-wrapper {
+        padding: var(--spacing-md);
+    }
+    
+    .navbar {
+        padding: 0.75rem 1rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .navbar-brand i {
+        font-size: 1.5rem;
+    }
+
+    .nav-link {
+        padding: 0.75rem 1rem;
+        margin: 0.25rem 0;
+        border-radius: 8px;
+    }
+
+    .nav-link:hover {
+        background-color: var(--hover-bg);
+    }
+
+    .row {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+    }
+
+    .col, .col-12, .col-md-6, .col-lg-4, .col-xl-3 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .stat-card {
+        margin-bottom: 1.5rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .row {
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+    }
+
+    .col, .col-12, .col-md-6, .col-lg-4, .col-xl-3 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Animations
+   ========================================================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Utility Classes
+   ========================================================================== */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Enhanced Button Styles
+   ========================================================================== */
+.btn {
+    position: relative;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn i {
+    font-size: 1.1rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+    );
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+    color: var(--background-card);
+    box-shadow: 0 2px 4px rgba(44, 122, 123, 0.1);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 122, 123, 0.2);
+}
+
+.btn-primary:hover i {
+    transform: translateX(3px);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(44, 122, 123, 0.15);
+}
+
+.btn-secondary {
+    background-color: var(--background-card);
+    border: 2px solid var(--border-color);
+    color: var(--text-dark);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover i {
+    transform: translateX(3px);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.btn-danger {
+    background: var(--danger);
+    border: none;
+    color: var(--background-card);
+    box-shadow: 0 2px 4px rgba(229, 62, 62, 0.1);
+}
+
+.btn-danger:hover {
+    background: #C53030;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2);
+}
+
+.btn-danger:hover i {
+    transform: translateX(3px);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(229, 62, 62, 0.15);
+}
+
+/* Small Button Variant
+   ========================================================================== */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-sm i {
+    font-size: 1rem;
+}
+
+/* Large Button Variant
+   ========================================================================== */
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+}
+
+.btn-lg i {
+    font-size: 1.25rem;
+}
+
+/* Icon Only Button
+   ========================================================================== */
+.btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.btn-icon i {
+    margin: 0;
+}
+
+.btn-icon:hover i {
+    transform: scale(1.1);
+}
+
+/* Disabled State
+   ========================================================================== */
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Focus and Active States
+   ========================================================================== */
+.btn:focus, .btn:active, .btn-primary:focus, .btn-primary:active {
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--background-card) !important;
+}
+
+.btn-secondary:focus, .btn-secondary:active {
+    background-color: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+}
+
+.btn-success:focus, .btn-success:active {
+    background-color: var(--success) !important;
+    border-color: var(--success) !important;
+}
+
+.btn-danger:focus, .btn-danger:active {
+    background-color: var(--danger) !important;
+    border-color: var(--danger) !important;
+}
+
+/* Typography Enhancements
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(120deg, var(--primary-dark), var(--primary-dark));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+.lead {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+}
+
+/* Enhanced Card Styles
+   ========================================================================== */
+.card {
+    background: var(--background-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-header {
+    background: linear-gradient(to right, rgba(44, 122, 123, 0.1), transparent);
+    border-bottom: 1px solid rgba(44, 122, 123, 0.1);
+    padding: 1.25rem;
+}
+
+.card-title {
+    color: var(--primary-dark);
+    font-weight: 600;
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+/* Enhanced Table Styles
+   ========================================================================== */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: var(--hover-bg);
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.table td {
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-dark);
+}
+
+/* Badge Enhancements
+   ========================================================================== */
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.badge.bg-primary {
+    background: var(--primary-color) !important;
+}
+
+.badge.bg-secondary {
+    background: var(--secondary-color) !important;
+}
+
+/* Notification Styles
+   ========================================================================== */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    max-width: 400px;
+}
+
+.notification.success {
+    border-left: 4px solid var(--success);
+}
+
+.notification.error {
+    border-left: 4px solid var(--danger);
+}
+
+/* Loading Animation Enhancement
+   ========================================================================== */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(44, 122, 123, 0.1);
+    border-top: 3px solid var(--primary-dark);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Footer
+   ========================================================================== */
+.footer {
+    background-color: var(--primary-dark);
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+    margin-top: auto;
+}
+
+/* Authentication Styles
+   ========================================================================== */
+.auth-card {
+    max-width: 500px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem;
+}
+
+.auth-card .card-body {
+    padding: 2rem;
+}
+
+.auth-card .form-label {
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.auth-card .form-control,
+.auth-card .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.auth-card .form-control:focus,
+.auth-card .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(44, 122, 123, 0.1);
+}
+
+.auth-card .btn-primary {
+    padding: 0.75rem 2rem;
+}
+
+/* Authentication Components
+   ========================================================================== */
+.auth-card {
+    background: var(--background-card);
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.auth-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.auth-header h4 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.auth-body {
+    padding: 2rem;
+}
+
+.section-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-light);
+}
+
+/* Form Icons */
+.input-icon-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-85%);
+    color: var(--text-light);
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.form-control-icon {
+    padding-left: 40px !important;
+}
+
+.btn-password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-85%);
+    background: none;
+    border: none;
+    color: var(--text-light);
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+}
+
+.btn-password-toggle:hover {
+    color: var(--primary);
+}
+
+/* Password Requirements */
+.password-requirements {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    margin: 8px 0 0 0;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.password-requirements::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.password-requirements li {
+    display: flex;
+    align-items: center;
+    color: var(--text-light);
+    margin: 0;
+    padding-right: 4px;
+}
+
+.password-requirements li i {
+    font-size: 0.7rem;
+    margin-right: 4px;
+}
+
+.password-requirements li.valid {
+    color: var(--success);
+}
+
+.password-requirements li.valid i {
+    color: var(--success);
+}
+
+/* Auth Card Improvements */
+.auth-card {
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.auth-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    text-align: center;
+}
+
+.auth-header h4 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.auth-header p {
+    opacity: 0.9;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.auth-body {
+    padding: 2rem;
+}
+
+/* Auth Buttons */
+.auth-buttons {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-auth i {
+    font-size: 1.1rem;
+}
+
+.btn-auth-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-auth-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-auth-secondary {
+    background: transparent;
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
+}
+
+.btn-auth-secondary:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-light);
+}
+
+/* Form Icons */
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-85%);
+    color: var(--text-light);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center
+}
+
+.form-control-icon {
+    padding-left: 40px !important;
+}
+
+/* Password Requirements */
+.password-requirements {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    margin: 8px 0 0 0;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.password-requirements::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.password-requirements li {
+    display: flex;
+    align-items: center;
+    color: var(--text-light);
+    margin: 0;
+    padding-right: 4px;
+}
+
+.password-requirements li i {
+    font-size: 0.7rem;
+    margin-right: 4px;
+}
+
+.password-requirements li.valid {
+    color: var(--success);
+}
+
+.password-requirements li.valid i {
+    color: var(--success);
+}
+
+/* Password Toggle Button and Match Feedback Styles */
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-85%);
+    color: var(--text-light);
+    width: 20px;
+    text-align: center;
+}
+
+.form-control-icon {
+    padding-left: 40px !important;
+}
+
+.btn-password-toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-85%);
+    background: none;
+    border: none;
+    color: var(--text-light);
+    padding: 0.375rem 0.75rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-password-toggle:hover {
+    color: var(--primary);
+}
+
+.password-match-feedback {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.password-match-feedback.text-success {
+    color: var(--success) !important;
+}
+
+.password-match-feedback.text-danger {
+    color: var(--danger) !important;
+}
+
+/* Password toggle button */
+.input-icon-wrapper {
+    position: relative;
+}
+
+.btn-password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-light);
+    cursor: pointer;
+    z-index: 3;
+}
+
+/* Hide default password toggle */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+/* Add spacing for password fields */
+.input-icon-wrapper input[type="password"] {
+    padding-right: 40px;
+}
+
+.form-control-icon {
+    padding-left: 40px !important;
+}

@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h2 class="mt-4">Collections Management</h2>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-truck-loading me-1"></i>
+                <h3>Collections</h3>
+            </div>
+            <a href="{{ url_for('admin.new_collection') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Add Collection
+            </a>
+        </div>
+        <div class="card-body px-0"> 
+            <div class="table-responsive">
+                <table id="collectionsTable" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%">User</th>
+                            <th style="width: 15%">Waste Type</th>
+                            <th style="width: 10%">Quantity</th>
+                            <th style="width: 10%">Status</th>
+                            <th style="width: 15%">Collection Date</th>
+                            <th style="width: 8%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for collection in collections %}
+                        <tr>
+                            <td class="text-nowrap">{{ collection.user.username }}</td>
+                            <td class="text-nowrap">{{ collection.waste_type.name }}</td>
+                            <td class="text-nowrap">{{ collection.quantity }} kg</td>
+                            <td class="text-nowrap">
+                                <span class="badge {% if collection.status == 'Pending' %}bg-warning
+                                      {% elif collection.status == 'In Progress' %}bg-info
+                                      {% elif collection.status == 'Completed' %}bg-success
+                                      {% else %}bg-danger{% endif %}">
+                                    {{ collection.status }}
+                                </span>
+                            </td>
+                            <td class="text-nowrap" data-order="{{ collection.collection_date.strftime('%Y%m%d%H%M%S') }}">
+                                {{ collection.collection_date.strftime('%Y-%m-%d %H:%M') }}
+                            </td>
+                            <td class="text-nowrap">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('admin.edit_collection', id=collection.id) }}" 
+                                       class="btn btn-sm btn-info" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Edit Collection">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger" 
+                                            onclick="confirmDelete(`{{ url_for('admin.delete_collection', id=collection.id) }}`, 'Are you sure you want to delete this collection?')"
+                                            data-bs-toggle="tooltip" 
+                                            title="Delete Collection">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dataTables_wrapper {
+    padding: 0 1.5rem;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    height: 38px;
+    width: 250px;
+    margin: 0 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #2C7A7B;
+    box-shadow: 0 0 0 0.25rem rgba(44, 122, 123, 0.25);
+    outline: 0;
+}
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.filter-container .text-muted {
+    margin: 0;
+    white-space: nowrap;
+    color: #2C7A7B;
+}
+
+.filter-container .form-select {
+    width: auto;
+    min-width: 150px;
+    height: 38px;
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.filter-container .form-select:focus {
+    border-color: #2C7A7B;
+    box-shadow: 0 0 0 0.25rem rgba(44, 122, 123, 0.25);
+    outline: 0;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 0;
+    gap: 0.25rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0;
+    margin: 0 0.125rem;
+    border-radius: 0.25rem;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    color: #6c757d !important;
+    cursor: pointer;
+    font-size: 0.875rem;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 122, 123, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.current):not(.disabled):after {
+    opacity: 1;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background-color: #2C7A7B !important;
+    border-color: #2C7A7B !important;
+    color: #fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.current),
+.dataTables_wrapper .dataTables_paginate .paginate_button:focus:not(.current) {
+    background-color: #e6f5f5 !important;
+    border-color: #2C7A7B !important;
+    color: #2C7A7B !important;
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:active {
+    background-color: #2C7A7B !important;
+    border-color: #2C7A7B !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+    color: #6c757d !important;
+    border-color: #dee2e6 !important;
+    background-color: #fff !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    padding: 0;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0.25rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous {
+    margin-right: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    margin-left: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button i {
+    font-size: 0.625rem;
+    position: relative;
+    transition: transform 0.2s ease-in-out;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous:not(.disabled):hover i {
+    transform: translateX(-2px);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.next:not(.disabled):hover i {
+    transform: translateX(2px);
+}
+
+.dataTables_wrapper .dataTables_paginate .ellipsis {
+    padding: 0 0.5rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+}
+
+:root {
+    --bs-pagination-active-bg: #2C7A7B;
+    --bs-pagination-active-border-color: #2C7A7B;
+    --bs-pagination-active-color: #fff;
+    --bs-pagination-hover-bg: #e6f5f5;
+    --bs-pagination-hover-border-color: #2C7A7B;
+    --bs-pagination-hover-color: #2C7A7B;
+}
+
+#collectionsTable {
+    margin: 0;
+    width: 100%;
+    table-layout: fixed;
+}
+
+#collectionsTable th,
+#collectionsTable td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#collectionsTable .btn-group {
+    display: flex;
+    justify-content: center;
+}
+
+#collectionsTable .btn-group .btn {
+    padding: 0.55rem 0.8rem;
+    margin: 0 0.125rem;
+}
+
+#collectionsTable .btn-group .btn i {
+    font-size: 0.875rem;
+}
+
+/* Override Bootstrap's pagination styles */
+.page-link {
+    color: #6c757d;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+    background-color: #2C7A7B !important;
+    border-color: #2C7A7B !important;
+    color: #fff !important;
+}
+
+.page-item:not(.active) .page-link:hover {
+    background-color:#2C7A7B;
+    border-color:#2C7A7B;
+    color:  #e6f5f5;
+}
+
+/* DataTables specific overrides */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current .page-link {
+    background-color: #2C7A7B !important;
+    border-color: #2C7A7B !important;
+    color: #fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:not(.current):not(.disabled):hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button:not(.current):not(.disabled):hover .page-link:hover {
+    background-color: #2C7A7B !important;
+    border-color: #2C7A7B !important;
+    color: #e6f5f5 !important;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+    .table-responsive {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .dataTables_wrapper {
+        padding: 0 1rem;
+    }
+    
+    .dataTables_filter input {
+        width: 200px !important;
+    }
+    
+    .filter-container .form-select {
+        min-width: 120px;
+    }
+    
+    .card-header .btn-primary {
+        padding: 0.375rem 0.75rem;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 992px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .filter-container .form-select {
+        width: 100%;
+    }
+    
+    .card-header .btn-primary {
+        padding: 0.375rem 0.75rem;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dataTables_wrapper {
+        padding: 0 0.5rem;
+    }
+    
+    .dataTables_filter input {
+        width: 150px !important;
+    }
+    
+    .table td, .table th {
+        padding: 0.5rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.4rem;
+    }
+    
+    .card-header .btn-primary {
+        padding: 0.375rem 0.75rem;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .card-body {
+        padding: 0.5rem;
+    }
+    
+    .dataTables_wrapper {
+        padding: 0 0.25rem;
+    }
+    
+    .dataTables_filter input {
+        width: 120px !important;
+    }
+    
+    .table td, .table th {
+        padding: 0.4rem;
+    }
+    
+    .card-header .btn-primary {
+        padding: 0.375rem 0.75rem;
+        min-width: 100px;
+    }
+}
+
+.card-header .btn-primary {
+    width: auto;
+    white-space: nowrap;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    min-width: 100px;
+    flex-shrink: 0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const collectionsTable = $('#collectionsTable').DataTable({
+            responsive: true,
+            order: [[4, 'desc']], // Sort by collection date by default
+            pageLength: 10,
+            dom: `<'row'<'col-sm-12 col-md-8'><'col-sm-12 col-md-4'f>>` +
+                 `<'row'<'col-sm-12'tr>>` +
+                 `<'row align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 d-flex justify-content-end'p>>`,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search collections...",
+                info: "<span class='text-muted'>Showing _START_ to _END_ of _TOTAL_ collections</span>",
+                infoEmpty: "<span class='text-muted'>No collections found</span>",
+                infoFiltered: "<span class='text-muted'>(filtered from _MAX_ total)</span>",
+                paginate: {
+                    previous: '<i class="fas fa-chevron-left fa-2xs"></i>',
+                    next: '<i class="fas fa-chevron-right fa-2xs"></i>'
+                }
+            },
+            columnDefs: [
+                {
+                    targets: -1, // Actions column
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 3, // Status column
+                    searchable: false
+                },
+                {
+                    targets: 4, // Date column
+                    type: 'date'
+                }
+            ],
+            initComplete: function() {
+                // Create filter container
+                const filterContainer = $('<div class="filter-container"></div>');
+                
+                // Waste Type filter
+                const wasteTypeFilter = $('<select style="color: #2C7A7B !important; font-weight: 500; font-size: 1rem ;" class="form-select"><option style = "color: #2C7A7B !important;" value="">All Waste Types</option></select>');
+                this.api().columns(1).every(function() {
+                    const column = this;
+                    column.data().unique().sort().each(function(d) {
+                        wasteTypeFilter.append(`<option value="${d}">${d}</option>`);
+                    });
+                });
+                wasteTypeFilter.on('change', function() {
+                    const val = $(this).val();
+                    collectionsTable.column(1).search(val ? `^${val}$` : '', true, false).draw();
+                });
+
+                // Add filter to container with label
+                filterContainer.append(
+                    wasteTypeFilter
+                );
+                
+                // Add container next to search
+                $('.dataTables_filter').prepend(filterContainer);
+
+                // Set search box width
+                $('.dataTables_filter input').css('width', '250px');
+                
+                // Style current page
+                $(this).on('draw.dt', function() {
+                    $('.paginate_button.current, .paginate_button.current .page-link').css({
+                        'background-color': '#2C7A7B !important',
+                        'border-color': '#2C7A7B !important',
+                        'color': '#fff !important'
+                    });
+                });
+                
+                // Initialize tooltips
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        });
+    } catch (error) {
+        console.error('DataTable initialization error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to initialize the collections table. Please try refreshing the page.',
+            confirmButtonText: 'OK'
+        });
+    }
+});
+
+function confirmDelete(url, message) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire(
+                        'Deleted!',
+                        'Collection has been deleted.',
+                        'success'
+                    ).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        data.message,
+                        'error'
+                    );
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire(
+                    'Error!',
+                    'Failed to delete collection.',
+                    'error'
+                );
+            });
+        }
+    });
+}
+</script>
+{% endblock %}

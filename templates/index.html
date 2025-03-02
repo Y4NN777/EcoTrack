@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center mb-4">Welcome to EcoTrack</h1>
+            <p class="text-center lead">Sustainable Waste Management Solution</p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <!-- Dashboard Stats -->
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="fas fa-trash-alt mb-2"></i>
+                <h3>{{ total_waste }}</h3>
+                <p>Total Waste Collected</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="fas fa-recycle mb-2"></i>
+                <h3>{{ recycling_rate }}%</h3>
+                <p>Recycling Rate</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="fas fa-calendar-check mb-2"></i>
+                <h3>{{ collections_today }}</h3>
+                <p>Collections Today</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="fas fa-truck mb-2"></i>
+                <h3>{{ active_routes }}</h3>
+                <p>Active Routes</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('new_waste_type') }}" class="btn btn-primary quick-action-btn">
+                            <i class="fas fa-plus-circle me-2"></i>Add Waste Type
+                        </a>
+                        <a href="{{ url_for('new_schedule') }}" class="btn btn-primary quick-action-btn">
+                            <i class="fas fa-calendar-plus me-2"></i>Create Schedule
+                        </a>
+                        <a href="{{ url_for('new_collection') }}" class="btn btn-primary quick-action-btn">
+                            <i class="fas fa-truck-loading me-2"></i>Log Collection
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-feed">
+                        {% for activity in recent_activities %}
+                        <div class="activity-item">
+                            <i class="fas fa-circle me-2"></i>
+                            <span class="activity-text">{{ activity.description }}</span>
+                            <small class="text-muted">{{ activity.time }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Upcoming Collections -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Upcoming Collections</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Waste Type</th>
+                                    <th>Location/Route</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for collection in upcoming_collections %}
+                                <tr>
+                                    <td>{{ collection.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% if collection.type == 'Collection' %}
+                                        <span class="badge bg-primary">Immediate</span>
+                                        {% else %}
+                                        <span class="badge bg-info">Scheduled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ collection.waste_type.name }}</td>
+                                    <td>{{ collection.location }}</td>
+                                    <td>
+                                        {% if collection.status == 'Scheduled' %}
+                                        <span class="badge bg-warning">{{ collection.status }}</span>
+                                        {% elif collection.status == 'Completed' %}
+                                        <span class="badge bg-success">{{ collection.status }}</span>
+                                        {% elif collection.status == 'In Progress' %}
+                                        <span class="badge bg-info">{{ collection.status }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ collection.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No upcoming collections</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

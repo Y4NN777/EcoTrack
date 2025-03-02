@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% if schedule %}Edit{% else %}New{% endif %} Collection Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Use this form to schedule future waste collections. For logging past collections, use the Collection feature.
+                    </div>
+                    <form method="POST" id="scheduleForm" action="{{ url_for('operator.edit_schedule', id=schedule.id) if schedule else url_for('operator.new_schedule') }}">
+                        <div class="mb-3">
+                            <label for="waste_type_id" class="form-label">Waste Type</label>
+                            <select class="form-select" id="waste_type_id" name="waste_type_id" required>
+                                <option value="">Select a waste type...</option>
+                                {% for waste_type in waste_types %}
+                                <option value="{{ waste_type.id }}" {% if schedule and schedule.waste_type_id == waste_type.id %}selected{% endif %}>
+                                    {{ waste_type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pickup_date" class="form-label">Pickup Date and Time</label>
+                            <input type="datetime-local" class="form-control" id="pickup_date" name="pickup_date" 
+                                   value="{{ schedule.pickup_date.strftime('%Y-%m-%dT%H:%M') if schedule else '' }}" required>
+                            <small class="text-muted">
+                                Schedule the date and time for the collection. Must be in the future.
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="route" class="form-label">Route</label>
+                            <input type="text" class="form-control" id="route" name="route" 
+                                   value="{{ schedule.route if schedule else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Team</label>
+                            <input type="text" class="form-control" id="team" name="team" 
+                                   value="{{ schedule.team if schedule else 'Default Team' }}" required>
+                        </div>
+                        {% if schedule %}
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="Scheduled" {% if schedule.status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                                <option value="In Progress" {% if schedule.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if schedule.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                <option value="Cancelled" {% if schedule.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        {% endif %}
+                        <div class="text-end">
+                            <a href="{{ url_for('operator.schedules') }}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set min datetime to now
+    const pickupDateInput = document.getElementById('pickup_date');
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    
+    pickupDateInput.setAttribute('min', minDateTime);
+    
+    // Validate date on input
+    pickupDateInput.addEventListener('input', function() {
+        const selectedDate = new Date(this.value);
+        const now = new Date();
+        
+        if (selectedDate <= now) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date',
+                text: 'Pickup date must be in the future'
+            });
+            this.value = '';
+        }
+    });
+
+    // Form submission with SweetAlert
+    const form = document.getElementById('scheduleForm');
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const selectedDate = new Date(pickupDateInput.value);
+        const now = new Date();
+        
+        if (selectedDate <= now) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date',
+                text: 'Pickup date must be in the future'
+            });
+            return;
+        }
+
+        // Show loading state
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.status === 'success') {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                // Redirect after success
+                window.location.href = data.redirect;
+            } else {
+                throw new Error(data.message || 'An error occurred');
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: error.message || 'Failed to process request',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
