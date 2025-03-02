@@ -121,50 +121,6 @@ wms/
 - **Form Validation**: Prevents SQL injection and XSS attacks
 - **Session Management**: Secure login sessions with expiration handling
 
-## Setup Guide
-
-### Prerequisites
-
-- Python 3.12
-- pip package manager
-- Web browser (Chrome/Firefox recommended)
-
-### Installation Steps
-
-1. **Setup Python Environment**
-
-   ```bash
-   python -m venv venv
-   venv\Scriptsctivate  # Windows
-   source venv/bin/activate  # macOS/Linux
-   ```
-
-2. **Install Dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Initialize Database**
-
-   ```bash
-   flask db upgrade
-   ```
-
-   Note: The database will be initialized with pre-configured data including:
-
-   - Admin user credentials
-   - Operator user credentials
-   - Reporting user credentials
-   - Initial waste types
-   - Sample collections and schedules
-
-4. **Run Application**
-
-   ```bash
-   flask run
-   ```
-
 ## Known Limitations
 
 1. Basic reporting functionalities (no advanced analytics yet)
@@ -172,9 +128,11 @@ wms/
 3. Single database support (future versions may support multiple DBs)
 4. No API endpoints for external integrations (planned for future updates)
 
-## Support
+## Important notes and Support
 
-For technical assistance and troubleshooting, contact:
+This software is being in progress of deployment and will be available soon on the internet for beta testing,
+and then open sourced 
+For more information, contact:
 
 - **DABO R Yanis Axel**
 - Email: `axel.studiesmail@gmail.com`
