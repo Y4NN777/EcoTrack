@@ -10,9 +10,8 @@ The application follows a modular structure with different blueprints for:
 - Operator functionality (operator_bp)
 - Reporting functionality (reporting_bp)
 
-Authors: GUISSOU Ali, DABO R Yanis Axel, OUEDRAOGO Yanis Aslane
-Course: Python Programming II
-Instructor: Mr Porgo
+Authors: DABO R Yanis Axel
+
 """
 
 from flask import Flask
@@ -39,7 +38,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'your-secret-key'  # Change in production
     
     # Set database path in instance folder
-    db_path = os.path.join(app.instance_path, 'wms.db')
+    db_path = os.path.join(app.instance_path, 'ecotrack.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
@@ -55,8 +54,8 @@ def create_app():
     with app.app_context():
         db.create_all()
         
-    # Initialize login manager (after tables are created)
-    init_login_manager(app)
+        # Initialize login manager (after tables are created)
+        init_login_manager(app)
 
     # Register blueprints
     app.register_blueprint(auth_bp)
