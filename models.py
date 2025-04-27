@@ -11,9 +11,8 @@ Models:
 - Schedule: Future collection planning
 - Report: Generated reports and analytics
 
-Authors: GUISSOU Ali, DABO R Yanis Axel, OUEDRAOGO Yanis Aslane
-Course: Python Programming II
-Instructor: Mr Porgo
+Authors: DABO R Yanis Axel
+
 """
 
 from flask_sqlalchemy import SQLAlchemy
