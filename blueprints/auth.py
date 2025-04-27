@@ -14,9 +14,8 @@ Role Decorators:
 - @operator_required: Ensures user is a waste management operator
 - @reporting_required: Ensures user has reporting access
 
-Authors: GUISSOU Ali, DABO R Yanis Axel, OUEDRAOGO Yanis Aslane
-Course: Python Programming II
-Instructor: Mr Porgo
+Authors: DABO R Yanis Axel
+
 """
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
@@ -37,12 +36,12 @@ def init_login_manager(app):
 
     # Create default admin user if it doesn't exist
     with app.app_context():
-        if not User.query.filter_by(username='admin').first():
+        if not User.query.filter_by(username='admin_y4nn777').first():
             admin = User(
-                username='admin',
+                username='admin_y4nn777',
                 email='admin@ecotrack.org',
-                first_name='Josias',
-                last_name='PORGO',
+                first_name='Yanis Axel',
+                last_name='DABO',
                 role='Administrator',
                 is_active=True
             )
