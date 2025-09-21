@@ -1,21 +1,6 @@
 
 # EcoTrack - Waste Management System Documentation
 
-## Author & Contributions
-
-### Developer: DABO R Yanis Axel (Y4NN), Y7 Solutions
-
-**Role**: Full Stack Developer
-
-As the sole developer of EcoTrack, I designed and built the entire system from the ground up. My key contributions include:
-
-- Architecting and implementing the database with structured models and relationships
-- Developing a secure authentication system with password hashing and CSRF protection
-- Designing and coding user roles, including admin, operator, and reporting functionalities
-- Enhancing UI/UX with pagination, dynamic interactions, and real-time updates
-- Implementing data validation and security measures to protect user information
-- Building an advanced reporting system with visual analytics and CSV exports
-
 ## Software Overview
 
 ### Purpose
